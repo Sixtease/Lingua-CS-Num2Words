@@ -18,7 +18,7 @@ use strict;
 BEGIN {
   use Exporter ();
   use vars qw($VERSION $REVISION @ISA @EXPORT_OK);
-  $VERSION    = 0.02;
+  $VERSION    = 0.03;
   ($REVISION) = '$Revision: 1.14 $' =~ /([\d.]+)/;
   @ISA        = qw(Exporter);
   @EXPORT_OK  = qw(&num2cs_cardinal);
@@ -178,7 +178,7 @@ Roman Vasicek E<lt>rv@petamem.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2004 PetaMem s.r.o.
+Copyright (c) 2002-2004 PetaMem s.r.o. - L<http://www.petamem.com/>
 
 This package is free software. You can redistribute and/or modify it under
 the same terms as Perl itself.
