@@ -1,0 +1,4 @@
+Revision history for Perl extension Lingua::CS::Num2Word.
+
+0.01	- original version;
+	- number to text conversion for whole numbers from 0 up to 999 999 999
