@@ -1,4 +1,4 @@
-Lingua/CS/Num2Word version 0.01
+Lingua/CS/Num2Word version 0.02
 ===============================
 
 Lingua::CS::Num2Word is a number to text convertor for czech. Output
@@ -17,7 +17,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2002 PetaMem s.r.o.
+Copyright (c) 2002-2004 PetaMem s.r.o.
 
 This package is free software. Tou can redistribute and/or modify it under
 the same terms as Perl itself.
