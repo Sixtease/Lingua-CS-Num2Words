@@ -124,6 +124,30 @@ sub num2cs_cardinal {
 
     $result = $tmp2.$tmp1;
 
+  } elsif ($number < 1e12) {
+    $remainder = $number % 1e9;
+    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
+    my $tmp2 = substr($number, 0, length($number)-9);
+    my $tmp3 = $tmp2 % 100;
+    my $tmp4 = $tmp2 % 10;
+
+    if ($tmp3 < 9 || $tmp3 > 20) {
+
+      if ($tmp4 == 1 && $tmp2 == 1) {
+        $tmp2 = 'miliarda';
+      } elsif ($tmp4 == 1) {
+        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jedna miliarda';
+      } elsif($tmp4 > 1 && $tmp4 < 5) {
+        $tmp2 = num2cs_cardinal($tmp2).' miliardy';
+      } else {
+        $tmp2 = num2cs_cardinal($tmp2).' miliard';
+      }
+    } else {
+      $tmp2 = num2cs_cardinal($tmp2).' miliard';
+    }
+
+    $result = $tmp2.$tmp1;
+
   } else {
     # >= 1 000 000 000 unsupported yet (miliard)
   }
