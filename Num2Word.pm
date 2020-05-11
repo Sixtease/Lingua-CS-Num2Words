@@ -86,13 +86,13 @@ sub num2cs_cardinal {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-	$tmp2 = 'tisíc';
+        $tmp2 = 'tisíc';
       } elsif ($tmp4 == 1) {
-	$tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden tisíc';
+        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden tisíc';
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-	$tmp2 = num2cs_cardinal($tmp2).' tisíce';
+        $tmp2 = num2cs_cardinal($tmp2).' tisíce';
       } else {
-	$tmp2 = num2cs_cardinal($tmp2).' tisíc';
+        $tmp2 = num2cs_cardinal($tmp2).' tisíc';
       }
     } else {
       $tmp2 = num2cs_cardinal($tmp2).' tisíc';
@@ -110,13 +110,13 @@ sub num2cs_cardinal {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-	$tmp2 = 'milion';
+        $tmp2 = 'milion';
       } elsif ($tmp4 == 1) {
-	$tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden milion';
+        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden milion';
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-	$tmp2 = num2cs_cardinal($tmp2).' miliony';
+        $tmp2 = num2cs_cardinal($tmp2).' miliony';
       } else {
-	$tmp2 = num2cs_cardinal($tmp2).' milionů';
+        $tmp2 = num2cs_cardinal($tmp2).' milionů';
       }
     } else {
       $tmp2 = num2cs_cardinal($tmp2).' milionů';
