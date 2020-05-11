@@ -10,6 +10,8 @@ package Lingua::CS::Num2Word;
 # {{{ use block
 
 use strict;
+use utf8;
+use open qw(:std :utf8);
 
 # }}}
 
@@ -29,20 +31,20 @@ BEGIN {
 # {{{ variables
 
 my %token1 = qw( 0 nula         1 jedna         2 dva
-                 3 tøi          4 ètyøi         5 pìt
-                 6 ¹est         7 sedm          8 osm
-                 9 devìt        10 deset        11 jedenáct
-                 12 dvanáct     13 tøináct      14 ètrnáct
-                 15 patnáct     16 ¹estnáct     17 sedmnáct
-                 18 osmnáct     19 devatenáct
+                 3 tÅ™i          4 ÄtyÅ™i         5 pÄ›t
+                 6 Å¡est         7 sedm          8 osm
+                 9 devÄ›t        10 deset        11 jedenÃ¡ct
+                 12 dvanÃ¡ct     13 tÅ™inÃ¡ct      14 ÄtrnÃ¡ct
+                 15 patnÃ¡ct     16 Å¡estnÃ¡ct     17 sedmnÃ¡ct
+                 18 osmnÃ¡ct     19 devatenÃ¡ct
                );
-my %token2 = qw( 20 dvacet      30 tøicet       40 ètyøicet
-                 50 padesát     60 ¹edesát      70 sedmdesát
-                 80 osmdesát    90 devadesát
+my %token2 = qw( 20 dvacet      30 tÅ™icet       40 ÄtyÅ™icet
+                 50 padesÃ¡t     60 Å¡edesÃ¡t      70 sedmdesÃ¡t
+                 80 osmdesÃ¡t    90 devadesÃ¡t
                );
-my %token3 = (  100, 'sto', 200, 'dvì stì',   300, 'tøi sta',
-                400, 'ètyøi sta', 500, 'pìt set',   600, '¹est set',
-                700, 'sedm set',  800, 'osm set',   900, 'devìt set'
+my %token3 = (  100, 'sto', 200, 'dvÄ› stÄ›',   300, 'tÅ™i sta',
+                400, 'ÄtyÅ™i sta', 500, 'pÄ›t set',   600, 'Å¡est set',
+                700, 'sedm set',  800, 'osm set',   900, 'devÄ›t set'
 	     );
 
 # }}}
@@ -84,16 +86,16 @@ sub num2cs_cardinal {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-	$tmp2 = 'tisíc';
+	$tmp2 = 'tisÃ­c';
       } elsif ($tmp4 == 1) {
-	$tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden tisíc';
+	$tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden tisÃ­c';
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-	$tmp2 = num2cs_cardinal($tmp2).' tisíce';
+	$tmp2 = num2cs_cardinal($tmp2).' tisÃ­ce';
       } else {
-	$tmp2 = num2cs_cardinal($tmp2).' tisíc';
+	$tmp2 = num2cs_cardinal($tmp2).' tisÃ­c';
       }
     } else {
-      $tmp2 = num2cs_cardinal($tmp2).' tisíc';
+      $tmp2 = num2cs_cardinal($tmp2).' tisÃ­c';
     }
 
     $result = $tmp2.$tmp1;
@@ -114,10 +116,10 @@ sub num2cs_cardinal {
       } elsif($tmp4 > 1 && $tmp4 < 5) {
 	$tmp2 = num2cs_cardinal($tmp2).' miliony';
       } else {
-	$tmp2 = num2cs_cardinal($tmp2).' milionù';
+	$tmp2 = num2cs_cardinal($tmp2).' milionÅ¯';
       }
     } else {
-      $tmp2 = num2cs_cardinal($tmp2).' milionù';
+      $tmp2 = num2cs_cardinal($tmp2).' milionÅ¯';
     }
 
     $result = $tmp2.$tmp1;
@@ -144,9 +146,9 @@ text is in iso-8859-2 encoding.
 =head1 SYNOPSIS
 
  use Lingua::CS::Num2Word;
- 
+
  my $text = Lingua::CS::Num2Word::num2cs_cardinal( 123 );
- 
+
  print $text || "sorry, can't convert this number into czech language.";
 
 =head1 DESCRIPTION
