@@ -58,27 +58,27 @@ sub num2cs_cardinal {
   # numbers less than 0 are not supported yet
   return $result if $number < 0;
 
-  my $reminder = 0;
+  my $remainder = 0;
 
   if ($number < 20) {
     $result = $token1{$number};
   } elsif ($number < 100) {
-    $reminder = $number % 10;
-    if ($reminder == 0) {
+    $remainder = $number % 10;
+    if ($remainder == 0) {
       $result = $token2{$number};
     } else {
-      $result = $token2{$number - $reminder}.' '.num2cs_cardinal($reminder);
+      $result = $token2{$number - $remainder}.' '.num2cs_cardinal($remainder);
     }
   } elsif ($number < 1_000) {
-    $reminder = $number % 100;
-    if ($reminder != 0) {
-      $result = $token3{$number - $reminder}.' '.num2cs_cardinal($reminder);
+    $remainder = $number % 100;
+    if ($remainder != 0) {
+      $result = $token3{$number - $remainder}.' '.num2cs_cardinal($remainder);
     } else {
       $result = $token3{$number};
     }
   } elsif ($number < 1_000_000) {
-    $reminder = $number % 1_000;
-    my $tmp1 = ($reminder != 0) ? ' '.num2cs_cardinal($reminder) : '';
+    $remainder = $number % 1_000;
+    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
     my $tmp2 = substr($number, 0, length($number)-3);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
@@ -101,8 +101,8 @@ sub num2cs_cardinal {
     $result = $tmp2.$tmp1;
 
   } elsif ($number < 1_000_000_000) {
-    $reminder = $number % 1_000_000;
-    my $tmp1 = ($reminder != 0) ? ' '.num2cs_cardinal($reminder) : '';
+    $remainder = $number % 1_000_000;
+    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
     my $tmp2 = substr($number, 0, length($number)-6);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
