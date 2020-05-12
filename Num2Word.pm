@@ -12,6 +12,7 @@ package Lingua::CS::Num2Word;
 use strict;
 use utf8;
 use open qw(:std :utf8);
+use 5.010;
 
 # }}}
 
@@ -51,58 +52,59 @@ my %token3 = (  100, 'sto', 200, 'dvě stě',   300, 'tři sta',
 
 # {{{ num2cs_cardinal           number to string conversion
 
-sub num2cs_cardinal {
-  my $result = '';
-  my $number = defined $_[0] ? shift : return $result;
+sub get_variants {
+  my @result;
+  my $number = shift;
+  return () if not defined $number;
 
   # numbers less than 0 are not supported yet
-  return $result if $number < 0;
+  return () if $number < 0;
 
   my $remainder = 0;
 
   if ($number < 20) {
-    $result = $token1{$number};
+    @result = [$token1{$number}];
   } elsif ($number < 100) {
     $remainder = $number % 10;
     if ($remainder == 0) {
-      $result = $token2{$number};
+      @result = [$token2{$number}];
     } else {
-      $result = $token2{$number - $remainder}.' '.num2cs_cardinal($remainder);
+      @result = ([$token2{$number - $remainder}], get_variants($remainder));
     }
   } elsif ($number < 1_000) {
     $remainder = $number % 100;
     if ($remainder != 0) {
-      $result = $token3{$number - $remainder}.' '.num2cs_cardinal($remainder);
+      @result = ([$token3{$number - $remainder}], get_variants($remainder));
     } else {
-      $result = $token3{$number};
+      @result = [$token3{$number}];
     }
   } elsif ($number < 1_000_000) {
     $remainder = $number % 1_000;
-    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
-    my $tmp2 = substr($number, 0, length($number)-3);
-    my $tmp3 = $tmp2 % 100;
-    my $tmp4 = $tmp2 % 10;
+    my $tmp2 = substr($number, 0, length($number)-3);  # number of thousands
+    my $tmp3 = $tmp2 % 100;                            # number of tens of thousands
+    my $tmp4 = $tmp2 % 10;                             # number of single thousands
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        $tmp2 = 'tisíc';
+        @result = ['tisíc'];
       } elsif ($tmp4 == 1) {
-        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden tisíc';
+        @result = (get_variants($tmp2 - $tmp4), ['jeden tisíc']);
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        $tmp2 = num2cs_cardinal($tmp2).' tisíce';
+        @result = (get_variants($tmp2), ['tisíce']);
       } else {
-        $tmp2 = num2cs_cardinal($tmp2).' tisíc';
+        @result = (get_variants($tmp2), ['tisíc']);
       }
     } else {
-      $tmp2 = num2cs_cardinal($tmp2).' tisíc';
+      @result = (get_variants($tmp2), ['tisíc']);
     }
 
-    $result = $tmp2.$tmp1;
+    if ($remainder != 0) {
+      push @result, get_variants($remainder);
+    }
 
   } elsif ($number < 1_000_000_000) {
     $remainder = $number % 1_000_000;
-    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
     my $tmp2 = substr($number, 0, length($number)-6);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
@@ -110,23 +112,24 @@ sub num2cs_cardinal {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        $tmp2 = 'milion';
+        @result = 'milion';
       } elsif ($tmp4 == 1) {
-        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jeden milion';
+        @result = (get_variants($tmp2 - $tmp4), ['jeden milion']);
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        $tmp2 = num2cs_cardinal($tmp2).' miliony';
+        @result = (get_variants($tmp2), ['miliony']);
       } else {
-        $tmp2 = num2cs_cardinal($tmp2).' milionů';
+        @result = (get_variants($tmp2), ['milionů']);
       }
     } else {
-      $tmp2 = num2cs_cardinal($tmp2).' milionů';
+      @result = (get_variants($tmp2), ['milionů']);
     }
 
-    $result = $tmp2.$tmp1;
+    if ($remainder != 0) {
+      push @result, get_variants($remainder);
+    }
 
   } elsif ($number < 1e12) {
     $remainder = $number % 1e9;
-    my $tmp1 = ($remainder != 0) ? ' '.num2cs_cardinal($remainder) : '';
     my $tmp2 = substr($number, 0, length($number)-9);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
@@ -134,25 +137,52 @@ sub num2cs_cardinal {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        $tmp2 = 'miliarda';
+        @result = ['miliarda'];
       } elsif ($tmp4 == 1) {
-        $tmp2 = num2cs_cardinal($tmp2 - $tmp4).' jedna miliarda';
+        @result = (get_variants($tmp2 - $tmp4), ['jedna miliarda']);
+      } elsif ($tmp4 == 2) {
+        @result = ['dvě miliardy'];
+        if ($tmp2 > 2) {
+          unshift @result, get_variants($tmp2 - $tmp4);
+        }
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        $tmp2 = num2cs_cardinal($tmp2).' miliardy';
+        @result = (get_variants($tmp2), ['miliardy']);
       } else {
-        $tmp2 = num2cs_cardinal($tmp2).' miliard';
+        @result = (get_variants($tmp2), ['miliard']);
       }
     } else {
-      $tmp2 = num2cs_cardinal($tmp2).' miliard';
+      @result = (get_variants($tmp2), ['miliard']);
     }
 
-    $result = $tmp2.$tmp1;
+    if ($remainder != 0) {
+      push @result, get_variants($remainder);
+    }
 
   } else {
     # >= 1 000 000 000 unsupported yet (miliard)
   }
 
-  return $result;
+  return @result;
+}
+
+sub unfold {
+  my @acc;
+  my @cur = @{ shift() };
+  if (@_ == 0) {
+    return @cur;
+  }
+  for my $head (@cur) {
+    for my $tail (unfold(@_)) {
+      push @acc, join ' ', $head, $tail;
+    }
+  }
+  return @acc;
+}
+
+sub num2cs_cardinal {
+  my $num = shift;
+  my @variants = get_variants($num);
+  return unfold @variants;
 }
 
 # }}}
