@@ -86,7 +86,15 @@ sub get_variants {
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
-      if ($tmp4 == 1 && $tmp2 == 1) {
+      if ($tmp4 == 1 && $tmp2 == 1 && $remainder >= 100) {
+        my $hundreds = int ($remainder / 100);
+        $remainder = $remainder % 100;
+
+        my @teenhundred = map { $_ . ' set' } map { @$_ } get_variants(10 + $hundreds);
+        my @thousandhundred = map { 'tisíc ' . $_ } map { @$_ } get_variants(100 * $hundreds);
+
+        @result = [@teenhundred, @thousandhundred];
+      } elsif ($tmp4 == 1 && $tmp2 == 1) {
         @result = ['tisíc'];
       } elsif ($tmp4 == 1) {
         @result = (get_variants($tmp2 - $tmp4), ['jeden tisíc']);
