@@ -112,7 +112,7 @@ sub get_variants {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        @result = 'milion';
+        @result = ['milion'];
       } elsif ($tmp4 == 1) {
         @result = (get_variants($tmp2 - $tmp4), ['jeden milion']);
       } elsif($tmp4 > 1 && $tmp4 < 5) {
@@ -182,6 +182,7 @@ sub unfold {
 sub num2cs_cardinal {
   my $num = shift;
   my @variants = get_variants($num);
+  # use Data::Dumper; print(Dumper(\@variants));
   return unfold @variants;
 }
 
