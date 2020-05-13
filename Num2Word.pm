@@ -278,9 +278,11 @@ sub alt {
   my @cur_acc = @$acc;
   my @new_acc;
   for my $item (@_) {
-    my ($unfolded_item) = unfold($item);
-    for my $branch (@cur_acc) {
-      push @new_acc, [@$branch, @$unfolded_item];
+    my @unfolded_item = unfold($item);
+    for my $unfolded_item (@unfolded_item) {
+      for my $branch (@cur_acc) {
+        push @new_acc, [@$branch, @$unfolded_item];
+      }
     }
   }
   @$acc = @new_acc;
