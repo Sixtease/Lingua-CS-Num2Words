@@ -5,6 +5,28 @@
 # PPCG: 0.7
 #
 
+=head1 NAME
+
+Lingua::CS::Num2Word - pronunciation variants for Czech numerals.
+
+=head1 SYNOPSIS
+
+ use Lingua::CS::Num2Word;
+
+ my @variants = Lingua::CS::Num2Word::num2cs_cardinal( 123 );
+
+ print 'you can cay 123 like this in Czech: ', join(', ', @variants);
+
+=head1 DESCRIPTION
+
+Lingua::CS::Num2Word is module for convertion numbers into their representation
+in czech. Converts whole numbers from 0 up to 999 999 999.
+
+=head2 Functions
+
+=over
+=cut
+
 package Lingua::CS::Num2Word;
 
 # {{{ use block
@@ -55,7 +77,18 @@ my %token3 = (
 
 # }}}
 
-# {{{ num2cs_cardinal           number to string conversion
+=item get_variants(1234)
+
+return a data structure describing the variants, in this example
+
+  (
+    ['|', ['dvanáct', 'set'], ['tisíc', ['dvě stě']]],
+    ['|', ['třicet', 'čtyři'], ['čtyřiatřicet']]
+  )
+
+A list starting with C<'|'> represents alternatives, other lists represent concatenation.
+
+=cut
 
 sub get_variants {
   my @result;
@@ -193,6 +226,13 @@ sub proc {
     seq($acc, @_);
   }
 }
+
+=item seq
+
+unfolds and concatenates items in a list
+
+=cut
+
 sub seq {
   my $acc = shift;
   for my $item (@_) {
@@ -206,6 +246,17 @@ sub seq {
     }
   }
 }
+
+=item alt
+
+add variants to accumulator
+
+with B branches in the accumulator and N items as parameters,
+unfolds all N items and makes N copies of every branch, appending
+an item to each copy
+
+=cut
+
 sub alt {
   my $acc = shift;
   my @cur_acc = @$acc;
@@ -218,14 +269,47 @@ sub alt {
   }
   @$acc = @new_acc;
 }
+
+=item unfold
+
+input:
+
+  (
+    ['|', ['dvanáct', 'set'], ['tisíc', ['dvě stě']]],
+    ['|', ['třicet', 'čtyři'], ['čtyřiatřicet']],
+  )
+
+output:
+
+  (
+    ['dvanáct', 'set', 'třicet', 'čtyři'],
+    ['dvanáct', 'set', 'čtyřiatřicet'],
+    ['tisíc', 'dvě stě', 'třicet', 'čtyři'],
+    ['tisíc', 'dvě stě', 'čtyřiatřicet'],
+  )
+=cut
 sub unfold {
   my $acc = [[]];
   proc($acc, @_);
   return @$acc;
 }
+
+=item flatten
+
+input: C<(['raz', 'dva'], ['tři', 'čtyři])>,
+output: C<(['raz dva'], ['tři čtyři'])>
+
+=cut
+
 sub flatten {
   return map { join ' ', @$_ } @_;
 }
+
+=item num2cs_cardinal
+
+return a list of pronunciation variants for given number
+
+=cut
 
 sub num2cs_cardinal {
   my $num = shift;
@@ -241,49 +325,21 @@ __END__
 
 # {{{ documentation
 
-=head1 NAME
-
-Lingua::CS::Num2Word -  number to text convertor for czech. Output
-text is in iso-8859-2 encoding.
-
-=head1 SYNOPSIS
-
- use Lingua::CS::Num2Word;
-
- my $text = Lingua::CS::Num2Word::num2cs_cardinal( 123 );
-
- print $text || "sorry, can't convert this number into czech language.";
-
-=head1 DESCRIPTION
-
-Lingua::CS::Num2Word is module for convertion numbers into their representation
-in czech. Converts whole numbers from 0 up to 999 999 999.
-
-=head2 Functions
-
-=over
-
-=item * num2cs_cardinal(number)
-
-Convert number to text representation.
-
 =back
 
 =head1 EXPORT_OK
 
 num2cs_cardinal
 
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
-Roman Vasicek E<lt>rv@petamem.comE<gt>
+Based on Lingua::CS::Num2Word by Roman Vasicek E<lt>rv@petamem.comE<gt>
+adapted by Jan Oldřich Krůza of Konica Minolta E<lt><jan.kruza@konicaminolta.czE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2004 PetaMem s.r.o. - L<http://www.petamem.com/>
+Copyright (c) 2002-2004 PetaMem s.r.o.
+Copyright (c) 2020 Konica Minolta
 
 This package is free software. You can redistribute and/or modify it under
 the same terms as Perl itself.
