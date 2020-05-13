@@ -110,14 +110,13 @@ sub get_variants {
   return () if $number < 0;
 
   # false if called recursively as a part of greater number
-  if ($opts{final}) {
+  if (delete $opts{final}) {
     if ($number == 1) {
       return (['|', 'jeden', 'jedna', 'jedno']);
     }
     if ($number == 2) {
       return (['|', 'dva', 'dvě']);
     }
-    delete $opts{final};  # don't pass this
   }
 
   my $remainder = 0;
@@ -130,13 +129,13 @@ sub get_variants {
       @result = $token2{$number};
     } else {
       my $tens = $number - $remainder;
-      if ($opts{skip_german_style}) {
-        @result = [$token2{$tens}, get_variants($remainder)];
+      if (delete $opts{skip_german_style}) {
+        @result = [$token2{$tens}, get_variants($remainder, %opts)];
       }
       else {
         @result = [
           '|',
-          [$token2{$tens}, get_variants($remainder)],
+          [$token2{$tens}, get_variants($remainder, %opts)],
           [join 'a', $token1_m{$remainder}, $token2{$tens}],
         ];
       }
@@ -173,16 +172,18 @@ sub get_variants {
           [get_variants($tmp2), 'tisíc'],
           [get_variants($tmp2 - $tmp4), 'jeden tisíc'],
         ];
-      } elsif($tmp4 > 1 && $tmp4 < 5) {
+      } elsif($tmp4 > 1 && $tmp4 < 5 && $tmp2 > $tmp4) {
         @result = ['|',
           [get_variants($tmp2), 'tisíc'],
           [get_variants($tmp2, skip_german_style => 1), 'tisíce'],
         ];
+      } elsif ($tmp4 > 1 && $tmp4 < 5) {
+        @result = (get_variants($tmp2), 'tisíce');
       } else {
-        @result = (get_variants($tmp2), ['tisíc']);
+        @result = (get_variants($tmp2), 'tisíc');
       }
     } else {
-      @result = (get_variants($tmp2), ['tisíc']);
+      @result = (get_variants($tmp2), 'tisíc');
     }
 
     if ($remainder != 0) {
@@ -198,16 +199,24 @@ sub get_variants {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        @result = ['milion'];
+        @result = ['|', 'milion', 'jeden milion'];
       } elsif ($tmp4 == 1) {
-        @result = (get_variants($tmp2 - $tmp4), ['jeden milion']);
+        @result = ['|',
+          [get_variants($tmp2), 'milionů'],
+          [get_variants($tmp2 - $tmp4), 'jeden milion'],
+        ];
+      } elsif($tmp4 > 1 && $tmp4 < 5 && $tmp2 > $tmp4) {
+        @result = ('|',
+          [get_variants($tmp2), 'milionů'],
+          [get_variants($tmp2, skip_german_style => 1), 'miliony'],
+        );
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        @result = (get_variants($tmp2), ['miliony']);
+        @result = (get_variants($tmp2), 'miliony'),
       } else {
-        @result = (get_variants($tmp2), ['milionů']);
+        @result = (get_variants($tmp2), 'milionů');
       }
     } else {
-      @result = (get_variants($tmp2), ['milionů']);
+      @result = (get_variants($tmp2), 'milionů');
     }
 
     if ($remainder != 0) {
@@ -223,16 +232,24 @@ sub get_variants {
     if ($tmp3 < 9 || $tmp3 > 20) {
 
       if ($tmp4 == 1 && $tmp2 == 1) {
-        @result = ['miliarda'];
+        @result = ['|', 'miliarda', 'jedna miliarda'];
       } elsif ($tmp4 == 1) {
-        @result = (get_variants($tmp2 - $tmp4), ['jedna miliarda']);
+        @result = ['|',
+          [get_variants($tmp2), ['miliard']],
+          [get_variants($tmp2 - $tmp4), ['jedna miliarda']],
+        ];
+      } elsif($tmp4 > 1 && $tmp4 < 5 && $tmp2 > $tmp4) {
+        @result = ['|',
+          [get_variants($tmp2), ['miliard']],
+          [get_variants($tmp2, gender => 'f', skip_german_style => 1), ['miliardy']],
+        ];
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        @result = (get_variants($tmp2, gender => 'f'), ['miliardy']);
+        @result = (get_variants($tmp2, gender => 'f'), 'miliardy')
       } else {
-        @result = (get_variants($tmp2), ['miliard']);
+        @result = (get_variants($tmp2), 'miliard');
       }
     } else {
-      @result = (get_variants($tmp2), ['miliard']);
+      @result = (get_variants($tmp2), 'miliard');
     }
 
     if ($remainder != 0) {
