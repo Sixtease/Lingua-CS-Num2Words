@@ -63,6 +63,16 @@ my %token1 = qw(
   18 osmnáct     19 devatenáct
 );
 
+my %token1_m = (%token1, 1 => 'jeden');
+my %token1_f = (%token1, 2 => 'dvě');
+my %token1_n = (%token1_f, 1 => 'jedno');
+my %token1_gender = (
+  g => \%token1,  # general
+  f => \%token1_f,
+  m => \%token1_m,
+  n => \%token1_n,
+);
+
 my %token2 = qw(
   20 dvacet      30 třicet       40 čtyřicet
   50 padesát     60 šedesát      70 sedmdesát
@@ -93,15 +103,26 @@ A list starting with C<'|'> represents alternatives, other lists represent conca
 sub get_variants {
   my @result;
   my $number = shift;
+  my %opts = @_;
   return () if not defined $number;
 
   # numbers less than 0 are not supported yet
   return () if $number < 0;
 
+  # false if called recursively as a part of greater number
+  if ($opts{final}) {
+    if ($number == 1) {
+      return (['|', 'jeden', 'jedna', 'jedno']);
+    }
+    if ($number == 2) {
+      return (['|', 'dva', 'dvě']);
+    }
+  }
+
   my $remainder = 0;
 
   if ($number < 20) {
-    @result = $token1{$number};
+    @result = $token1_gender{$opts{gender} || 'g'}{$number};
   } elsif ($number < 100) {
     $remainder = $number % 10;
     if ($remainder == 0) {
@@ -111,7 +132,7 @@ sub get_variants {
       @result = [
         '|',
         [$token2{$tens}, get_variants($remainder)],
-        [join 'a', $token1{$remainder}, $token2{$tens}],
+        [join 'a', $token1_m{$remainder}, $token2{$tens}],
       ];
     }
   } elsif ($number < 1_000) {
@@ -191,13 +212,8 @@ sub get_variants {
         @result = ['miliarda'];
       } elsif ($tmp4 == 1) {
         @result = (get_variants($tmp2 - $tmp4), ['jedna miliarda']);
-      } elsif ($tmp4 == 2) {
-        @result = ['dvě miliardy'];
-        if ($tmp2 > 2) {
-          unshift @result, get_variants($tmp2 - $tmp4);
-        }
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        @result = (get_variants($tmp2), ['miliardy']);
+        @result = (get_variants($tmp2, gender => 'f'), ['miliardy']);
       } else {
         @result = (get_variants($tmp2), ['miliard']);
       }
@@ -313,7 +329,7 @@ return a list of pronunciation variants for given number
 
 sub num2cs_cardinal {
   my $num = shift;
-  my @variants = get_variants($num);
+  my @variants = get_variants($num, final => 1);
   my @unfolded = unfold @variants;
   return flatten(@unfolded);
 }
