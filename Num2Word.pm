@@ -117,6 +117,7 @@ sub get_variants {
     if ($number == 2) {
       return (['|', 'dva', 'dvě']);
     }
+    delete $opts{final};  # don't pass this
   }
 
   my $remainder = 0;
@@ -129,16 +130,21 @@ sub get_variants {
       @result = $token2{$number};
     } else {
       my $tens = $number - $remainder;
-      @result = [
-        '|',
-        [$token2{$tens}, get_variants($remainder)],
-        [join 'a', $token1_m{$remainder}, $token2{$tens}],
-      ];
+      if ($opts{skip_german_style}) {
+        @result = [$token2{$tens}, get_variants($remainder)];
+      }
+      else {
+        @result = [
+          '|',
+          [$token2{$tens}, get_variants($remainder)],
+          [join 'a', $token1_m{$remainder}, $token2{$tens}],
+        ];
+      }
     }
   } elsif ($number < 1_000) {
     $remainder = $number % 100;
     if ($remainder != 0) {
-      @result = ([$token3{$number - $remainder}], get_variants($remainder));
+      @result = ([$token3{$number - $remainder}], get_variants($remainder, %opts));
     } else {
       @result = [$token3{$number}];
     }
@@ -155,15 +161,23 @@ sub get_variants {
         $remainder = $remainder % 100;
 
         my @teenhundred = map { [$_, 'set'] } get_variants(10 + $hundreds);
-        my @thousandhundred = map { ['tisíc', $_] } get_variants(100 * $hundreds);
+        my @thousandhundred = map {
+          [['|', 'tisíc', 'jeden tisíc'], $_]
+        } get_variants(100 * $hundreds);
 
         @result = ['|', @teenhundred, @thousandhundred];
       } elsif ($tmp4 == 1 && $tmp2 == 1) {
-        @result = ['tisíc'];
+        @result = ['|', 'tisíc', 'jeden tisíc'];
       } elsif ($tmp4 == 1) {
-        @result = (get_variants($tmp2 - $tmp4), ['jeden tisíc']);
+        @result = ['|',
+          [get_variants($tmp2), 'tisíc'],
+          [get_variants($tmp2 - $tmp4), 'jeden tisíc'],
+        ];
       } elsif($tmp4 > 1 && $tmp4 < 5) {
-        @result = (get_variants($tmp2), ['tisíce']);
+        @result = ['|',
+          [get_variants($tmp2), 'tisíc'],
+          [get_variants($tmp2, skip_german_style => 1), 'tisíce'],
+        ];
       } else {
         @result = (get_variants($tmp2), ['tisíc']);
       }
@@ -332,6 +346,7 @@ return a list of pronunciation variants for given number
 sub num2cs_cardinal {
   my $num = shift;
   my @variants = get_variants($num, final => 1);
+  #use Data::Dumper; print(Dumper(@variants));
   my @unfolded = unfold @variants;
   return flatten(@unfolded);
 }
