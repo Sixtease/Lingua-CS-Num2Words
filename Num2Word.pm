@@ -68,13 +68,18 @@ sub get_variants {
   my $remainder = 0;
 
   if ($number < 20) {
-    @result = [$token1{$number}];
+    @result = $token1{$number};
   } elsif ($number < 100) {
     $remainder = $number % 10;
     if ($remainder == 0) {
-      @result = [$token2{$number}];
+      @result = $token2{$number};
     } else {
-      @result = ([$token2{$number - $remainder}], get_variants($remainder));
+      my $tens = $number - $remainder;
+      @result = [
+        '|',
+        [$token2{$tens}, get_variants($remainder)],
+        [join 'a', $token1{$remainder}, $token2{$tens}],
+      ];
     }
   } elsif ($number < 1_000) {
     $remainder = $number % 100;
@@ -95,10 +100,10 @@ sub get_variants {
         my $hundreds = int ($remainder / 100);
         $remainder = $remainder % 100;
 
-        my @teenhundred = map { $_ . ' set' } map { @$_ } get_variants(10 + $hundreds);
-        my @thousandhundred = map { 'tisíc ' . $_ } map { @$_ } get_variants(100 * $hundreds);
+        my @teenhundred = map { [$_, 'set'] } get_variants(10 + $hundreds);
+        my @thousandhundred = map { ['tisíc', $_] } get_variants(100 * $hundreds);
 
-        @result = [@teenhundred, @thousandhundred];
+        @result = ['|', @teenhundred, @thousandhundred];
       } elsif ($tmp4 == 1 && $tmp2 == 1) {
         @result = ['tisíc'];
       } elsif ($tmp4 == 1) {
@@ -178,25 +183,55 @@ sub get_variants {
   return @result;
 }
 
-sub unfold {
-  my @acc;
-  my @cur = @{ shift() };
-  if (@_ == 0) {
-    return @cur;
+sub proc {
+  my $acc = shift;
+  if ($_[0] eq '|') {
+    shift;
+    alt($acc, @_);
   }
-  for my $head (@cur) {
-    for my $tail (unfold(@_)) {
-      push @acc, join ' ', $head, $tail;
+  else {
+    seq($acc, @_);
+  }
+}
+sub seq {
+  my $acc = shift;
+  for my $item (@_) {
+    if (ref $item) {
+      proc($acc, @$item);
+    }
+    else {
+      for my $branch (@$acc) {
+        push @$branch, $item;
+      }
     }
   }
-  return @acc;
+}
+sub alt {
+  my $acc = shift;
+  my @cur_acc = @$acc;
+  my @new_acc;
+  for my $item (@_) {
+    my ($unfolded_item) = unfold($item);
+    for my $branch (@cur_acc) {
+      push @new_acc, [@$branch, @$unfolded_item];
+    }
+  }
+  @$acc = @new_acc;
+}
+sub unfold {
+  my $acc = [[]];
+  proc($acc, @_);
+  return @$acc;
+}
+sub flatten {
+  return map { join ' ', @$_ } @_;
 }
 
 sub num2cs_cardinal {
   my $num = shift;
   my @variants = get_variants($num);
-  # use Data::Dumper; print(Dumper(\@variants));
-  return unfold @variants;
+  my @unfolded = unfold @variants;
+  return flatten(@unfolded);
 }
 
 # }}}
