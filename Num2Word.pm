@@ -43,8 +43,8 @@ use 5.010;
 BEGIN {
   use Exporter ();
   use vars qw($VERSION $REVISION @ISA @EXPORT_OK);
-  $VERSION    = 0.03;
-  ($REVISION) = '$Revision: 1.14 $' =~ /([\d.]+)/;
+  $VERSION    = 2.01;
+  ($REVISION) = '$Revision: 0.01 $' =~ /([\d.]+)/;
   @ISA        = qw(Exporter);
   @EXPORT_OK  = qw(&num2cs_cardinal);
 }
