@@ -27,6 +27,7 @@ use utf8;
 use open qw(:std :utf8);
 use 5.010;
 use Lingua::CS::Num2Word::Cardinal::Nominative;
+use Lingua::CS::Num2Word::Cardinal::Genitive;
 
 BEGIN {
   use Exporter ();
@@ -133,11 +134,30 @@ return a list of pronunciation variants for given number
 
 =cut
 
+my %case_to_package = (
+  n => 'Lingua::CS::Num2Word::Cardinal::Nominative',
+  g => 'Lingua::CS::Num2Word::Cardinal::Genitive',
+);
+
 sub num2cs_cardinal {
   my $num = shift;
-  my @variants = Lingua::CS::Num2Word::Cardinal::Nominative::get_variants($num, final => 1);
-  #use Data::Dumper; print(Dumper(@variants));
-  my @unfolded = unfold @variants;
+  my %opts = @_;
+  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
+
+  my @unfolded;
+  for my $case (@cases) {
+    my $package = $case_to_package{$case};
+    if (not $package) {
+      warn "unsupported case: $case";
+      next;
+    }
+    say $package;
+    no strict 'refs';
+    my @variants = "${package}::get_variants"->($num, final => 1);
+
+    #use Data::Dumper; print(Dumper(@variants));
+    push @unfolded, unfold @variants;
+  }
   return flatten(@unfolded);
 }
 

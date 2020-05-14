@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use 5.010;
 
-my %token1 = qw(
+our %token1 = qw(
    0 nula         1 jedna         2 dva
    3 tři          4 čtyři         5 pět
    6 šest         7 sedm          8 osm
@@ -14,23 +14,23 @@ my %token1 = qw(
   18 osmnáct     19 devatenáct
 );
 
-my %token1_m = (%token1, 1 => 'jeden');
-my %token1_f = (%token1, 2 => 'dvě');
-my %token1_n = (%token1_f, 1 => 'jedno');
-my %token1_gender = (
+our %token1_m = (%token1, 1 => 'jeden');
+our %token1_f = (%token1, 2 => 'dvě');
+our %token1_n = (%token1_f, 1 => 'jedno');
+our %token1_gender = (
   g => \%token1,  # general
   f => \%token1_f,
   m => \%token1_m,
   n => \%token1_n,
 );
 
-my %token2 = qw(
+our %token2 = qw(
   20 dvacet      30 třicet       40 čtyřicet
   50 padesát     60 šedesát      70 sedmdesát
   80 osmdesát    90 devadesát
 );
 
-my %token3 = (
+our %token3 = (
   100, 'sto',       200, 'dvě stě',   300, 'tři sta',
   400, 'čtyři sta', 500, 'pět set',   600, 'šest set',
   700, 'sedm set',  800, 'osm set',   900, 'devět set'
@@ -92,15 +92,15 @@ sub get_variants {
   } elsif ($number < 1_000) {
     $remainder = $number % 100;
     if ($remainder != 0) {
-      @result = ([$token3{$number - $remainder}], get_variants($remainder, %opts));
+      @result = ($token3{$number - $remainder}, get_variants($remainder, %opts));
     } else {
-      @result = [$token3{$number}];
+      @result = $token3{$number};
     }
   } elsif ($number < 1_000_000) {
     $remainder = $number % 1_000;
-    my $tmp2 = substr($number, 0, length($number)-3);  # number of thousands
-    my $tmp3 = $tmp2 % 100;                            # number of tens of thousands
-    my $tmp4 = $tmp2 % 10;                             # number of single thousands
+    my $tmp2 = int ($number / 1000);  # number of thousands
+    my $tmp3 = $tmp2 % 100;           # number of tens of thousands
+    my $tmp4 = $tmp2 % 10;            # number of single thousands
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
@@ -141,7 +141,7 @@ sub get_variants {
 
   } elsif ($number < 1_000_000_000) {
     $remainder = $number % 1_000_000;
-    my $tmp2 = substr($number, 0, length($number)-6);
+    my $tmp2 = int ($number / 1_000_000);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
 
@@ -174,7 +174,7 @@ sub get_variants {
 
   } elsif ($number < 1e12) {
     $remainder = $number % 1e9;
-    my $tmp2 = substr($number, 0, length($number)-9);
+    my $tmp2 = int ($number / 1e9);
     my $tmp3 = $tmp2 % 100;
     my $tmp4 = $tmp2 % 10;
 
