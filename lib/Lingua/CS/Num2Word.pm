@@ -22,12 +22,13 @@ in czech. Converts whole numbers from 0 up to 999 999 999.
 
 package Lingua::CS::Num2Word;
 
-use strict;
 use utf8;
+use strict;
 use open qw(:std :utf8);
 use 5.010;
 use Lingua::CS::Num2Word::Cardinal::Nominative;
 use Lingua::CS::Num2Word::Cardinal::Genitive;
+use Lingua::CS::Num2Word::Ordinal::Nominative;
 
 BEGIN {
   use Exporter ();
@@ -134,31 +135,37 @@ return a list of pronunciation variants for given number
 
 =cut
 
-my %case_to_package = (
-  n => 'Lingua::CS::Num2Word::Cardinal::Nominative',
-  g => 'Lingua::CS::Num2Word::Cardinal::Genitive',
+my %kind_case_to_package = (
+  cn => 'Lingua::CS::Num2Word::Cardinal::Nominative',
+  cg => 'Lingua::CS::Num2Word::Cardinal::Genitive',
+  on => 'Lingua::CS::Num2Word::Ordinal::Nominative',
 );
 
 sub num2cs_cardinal {
-  my $num = shift;
+  my $num = pop;
   my %opts = @_;
   my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
+  my @kinds = map {substr($_, 0, 1)} split /,/, ($opts{'--kind'} || 'cardinal,ordinal');
 
   my @unfolded;
-  for my $case (@cases) {
-    my $package = $case_to_package{$case};
-    if (not $package) {
-      warn "unsupported case: $case";
-      next;
-    }
-    say $package;
-    no strict 'refs';
-    my @variants = "${package}::get_variants"->($num, final => 1);
+  for my $kind (@kinds) {
+    for my $case (@cases) {
+      my $package = $kind_case_to_package{$kind.$case};
+      if (not $package) {
+        warn "unsupported kind & case: $kind & $case";
+        next;
+      }
+      say $package;
+      no strict 'refs';
+      my @variants = "${package}::get_variants"->($num, final => 1);
 
-    #use Data::Dumper; print(Dumper(@variants));
-    push @unfolded, unfold @variants;
+      #use Data::Dumper; print(Dumper(@variants));
+      push @unfolded, unfold @variants;
+    }
   }
-  return flatten(@unfolded);
+  my @flattened = flatten(@unfolded);
+  my %flattened_dedup = map {; $_ => 1 } @flattened;
+  return sort keys %flattened_dedup;
 }
 
 1;
