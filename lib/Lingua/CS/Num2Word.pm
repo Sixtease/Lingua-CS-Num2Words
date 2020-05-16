@@ -29,6 +29,7 @@ use 5.010;
 use Lingua::CS::Num2Word::Cardinal::Nominative;
 use Lingua::CS::Num2Word::Cardinal::Genitive;
 use Lingua::CS::Num2Word::Ordinal::Nominative;
+use Lingua::CS::Num2Word::Ordinal::Genitive;
 
 BEGIN {
   use Exporter ();
@@ -139,6 +140,7 @@ my %kind_case_to_package = (
   cn => 'Lingua::CS::Num2Word::Cardinal::Nominative',
   cg => 'Lingua::CS::Num2Word::Cardinal::Genitive',
   on => 'Lingua::CS::Num2Word::Ordinal::Nominative',
+  og => 'Lingua::CS::Num2Word::Ordinal::Genitive',
 );
 
 sub num2cs_cardinal {
