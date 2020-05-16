@@ -6,5 +6,6 @@ lib/Lingua/CS/Num2Word/Ordinal/Genitive.pm
 lib/Lingua/CS/Num2Word/Ordinal/Nominative.pm
 lib/Lingua/CS/Num2Word/Cardinal/Genitive.pm
 lib/Lingua/CS/Num2Word/Cardinal/Nominative.pm
+lib/Lingua/CS/Num2Word/Date.pm
 README
 t/use.t

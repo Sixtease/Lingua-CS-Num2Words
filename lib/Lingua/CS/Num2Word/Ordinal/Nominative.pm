@@ -5,7 +5,7 @@ use strict;
 use 5.010;
 use Lingua::CS::Num2Word::Cardinal::Nominative;
 
-our %token1_f = qw(
+our %token1_f_canonical = qw(
    0 nultá        1 první         2 druhá
    3 třetí        4 čtvrtá        5 pátá
    6 šestá        7 sedmá         8 osmá
@@ -15,7 +15,7 @@ our %token1_f = qw(
   18 osmnáctá    19 devatenáctá
 );
 
-our %token1_m = qw(
+our %token1_m_canonical = qw(
    0 nultý        1 první         2 druhý
    3 třetí        4 čtvrtý        5 pátý
    6 šestý        7 sedmý         8 osmý
@@ -25,7 +25,7 @@ our %token1_m = qw(
   18 osmnáctý    19 devatenáctý
 );
 
-our %token1_n = qw(
+our %token1_n_canonical = qw(
    0 nulté        1 první         2 druhé
    3 třetí        4 čtvrté        5 páté
    6 šesté        7 sedmé         8 osmé
@@ -35,9 +35,9 @@ our %token1_n = qw(
   18 osmnácté    19 devatenácté
 );
 
-$token1_f{1} = ['|', 'první', 'prvá'];
-$token1_m{1} = ['|', 'první', 'prvý'];
-$token1_n{1} = ['|', 'první', 'prvé'];
+our %token1_f = (%token1_f_canonical, 1 => ['|', 'první', 'prvá']);
+our %token1_m = (%token1_m_canonical, 1 => ['|', 'první', 'prvý']);
+our %token1_n = (%token1_n_canonical, 1 => ['|', 'první', 'prvé']);
 
 our %token2_f = qw(
   20 dvacátá     30 třicátá      40 čtyřicátá
@@ -58,15 +58,27 @@ our %token2_n = qw(
 );
 
 sub token {
-  my ($i, $gender) = @_;
-  return {
-    f1 => \%token1_f,
-    m1 => \%token1_m,
-    n1 => \%token1_n,
-    f2 => \%token2_f,
-    m2 => \%token2_m,
-    n2 => \%token2_n,
-  }->{$gender.$i};
+  my ($i, $gender, %opts) = @_;
+  if ($opts{canonical}) {
+    return {
+      f1 => \%token1_f_canonical,
+      m1 => \%token1_m_canonical,
+      n1 => \%token1_n_canonical,
+      f2 => \%token2_f,
+      m2 => \%token2_m,
+      n2 => \%token2_n,
+    }->{$gender.$i};
+  }
+  else {
+    return {
+      f1 => \%token1_f,
+      m1 => \%token1_m,
+      n1 => \%token1_n,
+      f2 => \%token2_f,
+      m2 => \%token2_m,
+      n2 => \%token2_n,
+    }->{$gender.$i};
+  }
 }
 
 sub get_variants {
@@ -96,7 +108,7 @@ sub get_variants {
   my $remainder = 0;
 
   if ($number < 20) {
-    @result = token(1, $gender)->{$number};
+    @result = token(1, $gender, %opts)->{$number};
   } elsif ($number < 100) {
     $remainder = $number % 10;
     if ($remainder == 0) {

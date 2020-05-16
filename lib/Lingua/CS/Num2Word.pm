@@ -30,6 +30,7 @@ use Lingua::CS::Num2Word::Cardinal::Nominative;
 use Lingua::CS::Num2Word::Cardinal::Genitive;
 use Lingua::CS::Num2Word::Ordinal::Nominative;
 use Lingua::CS::Num2Word::Ordinal::Genitive;
+use Lingua::CS::Num2Word::Date;
 
 BEGIN {
   use Exporter ();
@@ -37,7 +38,7 @@ BEGIN {
   $VERSION    = 2.01;
   ($REVISION) = '$Revision: 0.01 $' =~ /([\d.]+)/;
   @ISA        = qw(Exporter);
-  @EXPORT_OK  = qw(&num2cs_cardinal);
+  @EXPORT_OK  = qw(num2cs_cardinal num2cs_ordinal num2cs_date);
 }
 sub proc {
   my $acc = shift;
@@ -147,24 +148,61 @@ sub num2cs_cardinal {
   my $num = pop;
   my %opts = @_;
   my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
-  my @kinds = map {substr($_, 0, 1)} split /,/, ($opts{'--kind'} || 'cardinal,ordinal');
+  my $kind = 'c';
 
   my @unfolded;
-  for my $kind (@kinds) {
-    for my $case (@cases) {
-      my $package = $kind_case_to_package{$kind.$case};
-      if (not $package) {
-        warn "unsupported kind & case: $kind & $case";
-        next;
-      }
-      say $package;
-      no strict 'refs';
-      my @variants = "${package}::get_variants"->($num, final => 1);
-
-      #use Data::Dumper; print(Dumper(@variants));
-      push @unfolded, unfold @variants;
+  for my $case (@cases) {
+    my $package = $kind_case_to_package{$kind.$case};
+    if (not $package) {
+      warn "unsupported case for cardinals: $case";
+      next;
     }
+    say $package;
+    no strict 'refs';
+    my @variants = "${package}::get_variants"->($num, final => 1);
+
+    #use Data::Dumper; print(Dumper(@variants));
+    push @unfolded, unfold @variants;
   }
+
+  my @flattened = flatten(@unfolded);
+  my %flattened_dedup = map {; $_ => 1 } @flattened;
+  return sort keys %flattened_dedup;
+}
+
+sub num2cs_ordinal {
+  my $num = pop;
+  my %opts = @_;
+  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
+  my $kind = 'o';
+
+  my @unfolded;
+  for my $case (@cases) {
+    my $package = $kind_case_to_package{$kind.$case};
+    if (not $package) {
+      warn "unsupported case for ordinals: $case";
+      next;
+    }
+    say $package;
+    no strict 'refs';
+    my @variants = "${package}::get_variants"->($num, final => 1);
+
+    #use Data::Dumper; print(Dumper(@variants));
+    push @unfolded, unfold @variants;
+  }
+
+  my @flattened = flatten(@unfolded);
+  my %flattened_dedup = map {; $_ => 1 } @flattened;
+  return sort keys %flattened_dedup;
+}
+
+sub num2cs_date {
+  my $date_str = pop;
+
+  my @variants = Lingua::CS::Num2Word::Date::get_variants($date_str, final => 1);
+  use Data::Dumper; print(Dumper(@variants));
+
+  my @unfolded = unfold @variants;
   my @flattened = flatten(@unfolded);
   my %flattened_dedup = map {; $_ => 1 } @flattened;
   return sort keys %flattened_dedup;

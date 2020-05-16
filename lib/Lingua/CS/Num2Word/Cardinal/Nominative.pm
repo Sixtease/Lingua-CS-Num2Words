@@ -101,6 +101,7 @@ sub get_variants {
     my $tmp2 = int ($number / 1000);  # number of thousands
     my $tmp3 = $tmp2 % 100;           # number of tens of thousands
     my $tmp4 = $tmp2 % 10;            # number of single thousands
+    my $thousandprefix = $opts{skip_leading_one} ? 'tisíc' : ['|', 'tisíc', 'jeden tisíc'];
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
@@ -110,12 +111,12 @@ sub get_variants {
 
         my @teenhundred = map { [$_, 'set'] } get_variants(10 + $hundreds);
         my @thousandhundred = map {
-          [['|', 'tisíc', 'jeden tisíc'], $_]
+          [$thousandprefix, $_]
         } get_variants(100 * $hundreds);
 
         @result = ['|', @teenhundred, @thousandhundred];
       } elsif ($tmp4 == 1 && $tmp2 == 1) {
-        @result = ['|', 'tisíc', 'jeden tisíc'];
+        @result = $thousandprefix;
       } elsif ($tmp4 == 1) {
         @result = ['|',
           [get_variants($tmp2), 'tisíc'],
@@ -147,7 +148,9 @@ sub get_variants {
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
-      if ($tmp4 == 1 && $tmp2 == 1) {
+      if ($tmp4 == 1 && $tmp2 == 1 && $opts{skip_leading_one}) {
+        @result = 'milion';
+      } elsif ($tmp4 == 1 && $tmp2 == 1) {
         @result = ['|', 'milion', 'jeden milion'];
       } elsif ($tmp4 == 1) {
         @result = ['|',
@@ -180,7 +183,9 @@ sub get_variants {
 
     if ($tmp3 < 9 || $tmp3 > 20) {
 
-      if ($tmp4 == 1 && $tmp2 == 1) {
+      if ($tmp4 == 1 && $tmp2 == 1 && $opts{skip_leading_one}) {
+        @result = 'miliarda';
+      } elsif ($tmp4 == 1 && $tmp2 == 1) {
         @result = ['|', 'miliarda', 'jedna miliarda'];
       } elsif ($tmp4 == 1) {
         @result = ['|',
