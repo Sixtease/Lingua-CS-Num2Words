@@ -1,9 +1,9 @@
-package Lingua::CS::Num2Word::Cardinal::Genitive;
+package Lingua::CS::Num2Words::Cardinal::Genitive;
 
 use utf8;
 use strict;
 use 5.010;
-use Lingua::CS::Num2Word::Cardinal::Nominative;
+use Lingua::CS::Num2Words::Cardinal::Nominative;
 
 my %token1 = qw(
    0 nuly         1 jedné         2 dvou
@@ -83,7 +83,7 @@ sub get_variants {
         @result = [$token2{$tens}, get_variants($remainder, %opts)];
       }
       else {
-        my $nom_units = $Lingua::CS::Num2Word::Cardinal::Nominative::token1_m{$remainder};
+        my $nom_units = $Lingua::CS::Num2Words::Cardinal::Nominative::token1_m{$remainder};
         @result = [
           '|',
           [$token2{$tens}, get_variants($remainder, %opts)],
@@ -95,18 +95,18 @@ sub get_variants {
     $remainder = $number % 100;
     if ($remainder != 0) {
       if ($number < 200) {
-        @result = ($Lingua::CS::Num2Word::Cardinal::Nominative::token3{$number - $remainder}, get_variants($remainder, %opts));
+        @result = ($Lingua::CS::Num2Words::Cardinal::Nominative::token3{$number - $remainder}, get_variants($remainder, %opts));
       }
       else {
         @result = (
-          ['|', $Lingua::CS::Num2Word::Cardinal::Nominative::token3{$number - $remainder}, $token3{$number - $remainder}],
+          ['|', $Lingua::CS::Num2Words::Cardinal::Nominative::token3{$number - $remainder}, $token3{$number - $remainder}],
           get_variants($remainder, %opts),
         );
       }
     } elsif ($final or $remainder == 0) {
       @result = [$token3{$number}];
     } else {
-      @result = [$Lingua::CS::Num2Word::Cardinal::Nominative::token3{$number}];
+      @result = [$Lingua::CS::Num2Words::Cardinal::Nominative::token3{$number}];
     }
   } elsif ($number < 20_000) {
     $remainder = $number % 1_000;
@@ -133,17 +133,17 @@ sub get_variants {
       @result = ['|',
         [get_variants($tmp2), 'tisíc'],
         [get_variants($tmp2 - $tmp4), 'jednoho tisíce'],
-        [Lingua::CS::Num2Word::Cardinal::Nominative::get_variants(1000 * $tmp2)],
+        [Lingua::CS::Num2Words::Cardinal::Nominative::get_variants(1000 * $tmp2)],
       ];
     } elsif ($tmp2 > 1 && $tmp2 < 5 && $remainder > 0) {
       @result = ['|',
         [get_variants($tmp2), 'tisíc'],
-        [Lingua::CS::Num2Word::Cardinal::Nominative::get_variants($tmp2), 'tisíce'],
+        [Lingua::CS::Num2Words::Cardinal::Nominative::get_variants($tmp2), 'tisíce'],
       ];
     } elsif ($remainder > 0) {
       @result = (['|',
         [get_variants($tmp2)],
-        [Lingua::CS::Num2Word::Cardinal::Nominative::get_variants($tmp2)],
+        [Lingua::CS::Num2Words::Cardinal::Nominative::get_variants($tmp2)],
       ], 'tisíc');
     } else {
       @result = (get_variants($tmp2), 'tisíc');

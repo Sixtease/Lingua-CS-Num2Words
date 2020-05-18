@@ -1,9 +1,9 @@
-package Lingua::CS::Num2Word::Ordinal::Nominative;
+package Lingua::CS::Num2Words::Ordinal::Nominative;
 
 use utf8;
 use strict;
 use 5.010;
-use Lingua::CS::Num2Word::Cardinal::Nominative;
+use Lingua::CS::Num2Words::Cardinal::Nominative;
 
 our %token1_f_canonical = qw(
    0 nultá        1 první         2 druhá
@@ -123,7 +123,7 @@ sub get_variants {
           '|',
           [token(2, $gender)->{$tens}, get_variants($remainder, %opts)],
           [join 'a',
-            $Lingua::CS::Num2Word::Cardinal::Nominative::token1_m{$remainder},
+            $Lingua::CS::Num2Words::Cardinal::Nominative::token1_m{$remainder},
             token(2, $gender)->{$tens},
           ],
         ];

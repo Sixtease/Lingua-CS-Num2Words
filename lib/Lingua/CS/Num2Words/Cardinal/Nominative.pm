@@ -1,4 +1,4 @@
-package Lingua::CS::Num2Word::Cardinal::Nominative;
+package Lingua::CS::Num2Words::Cardinal::Nominative;
 
 use utf8;
 use strict;

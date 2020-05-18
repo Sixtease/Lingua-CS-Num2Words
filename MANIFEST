@@ -1,11 +1,11 @@
 Changes
 MANIFEST			This list of files
 Makefile.PL
-lib/Lingua/CS/Num2Word.pm
-lib/Lingua/CS/Num2Word/Ordinal/Genitive.pm
-lib/Lingua/CS/Num2Word/Ordinal/Nominative.pm
-lib/Lingua/CS/Num2Word/Cardinal/Genitive.pm
-lib/Lingua/CS/Num2Word/Cardinal/Nominative.pm
-lib/Lingua/CS/Num2Word/Date.pm
+lib/Lingua/CS/Num2Words.pm
+lib/Lingua/CS/Num2Words/Ordinal/Genitive.pm
+lib/Lingua/CS/Num2Words/Ordinal/Nominative.pm
+lib/Lingua/CS/Num2Words/Cardinal/Genitive.pm
+lib/Lingua/CS/Num2Words/Cardinal/Nominative.pm
+lib/Lingua/CS/Num2Words/Date.pm
 README
 t/use.t

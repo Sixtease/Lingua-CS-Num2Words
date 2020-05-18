@@ -1,36 +1,55 @@
 =head1 NAME
 
-Lingua::CS::Num2Word - pronunciation variants for Czech numerals.
+Lingua::CS::Num2Words - pronunciation variants for Czech numerals.
 
 =head1 SYNOPSIS
 
- use Lingua::CS::Num2Word;
+ use Lingua::CS::Num2Words;
 
- my @variants = Lingua::CS::Num2Word::num2cs_cardinal( 123 );
+ my @variants = Lingua::CS::Num2Words::num2cs_cardinal( 123 );
 
  print 'you can cay 123 like this in Czech: ', join(', ', @variants);
 
 =head1 DESCRIPTION
 
-Lingua::CS::Num2Word is module for convertion numbers into their representation
-in czech. Converts whole numbers from 0 up to 999 999 999.
+Based on Lingua::CS::Num2Word by Roman Vašíček
+
+Lingua::CS::Num2Words converts numbers into Czech numerals.
+The ambition is to generate all legitimate variants but
+current coverage is:
+
+=over
+
+=item 0 .. 1e12-1 for cardinals in nominative
+(nula .. devět set miliard),
+
+=item  0 .. 19999 for cardinals in genitive
+(nuly .. devatenácti tisíc),
+
+=item 0 .. 99 for ordinals in nominative and genitive
+(nultý/-ého .. devadesátý devátý/-ého),
+
+=item dates
+(pátého června dva tisíce dvacet)
+
+=back
 
 =head2 Functions
 
 =over
 =cut
 
-package Lingua::CS::Num2Word;
+package Lingua::CS::Num2Words;
 
 use utf8;
 use strict;
 use open qw(:std :utf8);
 use 5.010;
-use Lingua::CS::Num2Word::Cardinal::Nominative;
-use Lingua::CS::Num2Word::Cardinal::Genitive;
-use Lingua::CS::Num2Word::Ordinal::Nominative;
-use Lingua::CS::Num2Word::Ordinal::Genitive;
-use Lingua::CS::Num2Word::Date;
+use Lingua::CS::Num2Words::Cardinal::Nominative;
+use Lingua::CS::Num2Words::Cardinal::Genitive;
+use Lingua::CS::Num2Words::Ordinal::Nominative;
+use Lingua::CS::Num2Words::Ordinal::Genitive;
+use Lingua::CS::Num2Words::Date;
 
 BEGIN {
   use Exporter ();
@@ -138,10 +157,10 @@ return a list of pronunciation variants for given number
 =cut
 
 my %kind_case_to_package = (
-  cn => 'Lingua::CS::Num2Word::Cardinal::Nominative',
-  cg => 'Lingua::CS::Num2Word::Cardinal::Genitive',
-  on => 'Lingua::CS::Num2Word::Ordinal::Nominative',
-  og => 'Lingua::CS::Num2Word::Ordinal::Genitive',
+  cn => 'Lingua::CS::Num2Words::Cardinal::Nominative',
+  cg => 'Lingua::CS::Num2Words::Cardinal::Genitive',
+  on => 'Lingua::CS::Num2Words::Ordinal::Nominative',
+  og => 'Lingua::CS::Num2Words::Ordinal::Genitive',
 );
 
 sub num2cs_cardinal {
@@ -199,8 +218,8 @@ sub num2cs_ordinal {
 sub num2cs_date {
   my $date_str = pop;
 
-  my @variants = Lingua::CS::Num2Word::Date::get_variants($date_str, final => 1);
-  use Data::Dumper; print(Dumper(@variants));
+  my @variants = Lingua::CS::Num2Words::Date::get_variants($date_str, final => 1);
+  #use Data::Dumper; print(Dumper(@variants));
 
   my @unfolded = unfold @variants;
   my @flattened = flatten(@unfolded);
@@ -219,13 +238,11 @@ num2cs_cardinal
 
 =head1 AUTHOR
 
-Based on Lingua::CS::Num2Word by Roman Vasicek E<lt>rv@petamem.comE<gt>
-adapted by Jan Oldřich Krůza of Konica Minolta E<lt><jan.kruza@konicaminolta.czE<gt>
+Jan Oldřich Krůza C<< <sixtease@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2004 PetaMem s.r.o.
-Copyright (c) 2020 Konica Minolta
+Copyright (c) 2020 Jan Oldřich Krůza
 
 This package is free software. You can redistribute and/or modify it under
 the same terms as Perl itself.

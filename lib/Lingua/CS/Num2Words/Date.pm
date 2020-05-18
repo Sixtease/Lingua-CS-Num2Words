@@ -1,11 +1,11 @@
-package Lingua::CS::Num2Word::Date;
+package Lingua::CS::Num2Words::Date;
 
 use utf8;
 use strict;
 use 5.010;
-use Lingua::CS::Num2Word::Ordinal::Genitive;
-use Lingua::CS::Num2Word::Ordinal::Nominative;
-use Lingua::CS::Num2Word::Cardinal::Nominative;
+use Lingua::CS::Num2Words::Ordinal::Genitive;
+use Lingua::CS::Num2Words::Ordinal::Nominative;
+use Lingua::CS::Num2Words::Cardinal::Nominative;
 
 my @word_months_nominative = ('', qw(
   leden  únor   březen   duben
@@ -70,20 +70,20 @@ sub get_variants {
 
   my @result = ['|',
     [
-      [Lingua::CS::Num2Word::Ordinal::Genitive::get_variants($day, final => 1)],
+      [Lingua::CS::Num2Words::Ordinal::Genitive::get_variants($day, final => 1)],
       ['|',
-        [Lingua::CS::Num2Word::Ordinal::Nominative::get_variants($month, gender => 'm', canonical => 1, final => 1)],
+        [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants($month, gender => 'm', canonical => 1, final => 1)],
         [$word_months_genitive[$month]],
       ],
     ],
     [
-      [Lingua::CS::Num2Word::Ordinal::Nominative::get_variants($day, gender => 'm', canonical => 1, final => 1)],
+      [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants($day, gender => 'm', canonical => 1, final => 1)],
       [$word_months_nominative[$month]],
     ],
   ];
 
   if ($year) {
-    push @result, [Lingua::CS::Num2Word::Cardinal::Nominative::get_variants($year, final => 1, skip_leading_one => 1)];
+    push @result, [Lingua::CS::Num2Words::Cardinal::Nominative::get_variants($year, final => 1, skip_leading_one => 1)];
   }
 
   return @result;
