@@ -1,5 +1,5 @@
-Lingua/CS/Num2Word version 0.03
-===============================
+Lingua::CS::Num2Words version 2.01
+==================================
 
 Lingua::CS::Num2Words is a number-to-text convertor for czech.
 Outputs all grammatical variants for the given cardinal or ordinal number.
