@@ -49,6 +49,7 @@ use Lingua::CS::Num2Words::Cardinal::Nominative;
 use Lingua::CS::Num2Words::Cardinal::Genitive;
 use Lingua::CS::Num2Words::Ordinal::Nominative;
 use Lingua::CS::Num2Words::Ordinal::Genitive;
+use Lingua::CS::Num2Words::Decimal;
 use Lingua::CS::Num2Words::Date;
 
 BEGIN {
@@ -161,6 +162,7 @@ my %kind_case_to_package = (
   cg => 'Lingua::CS::Num2Words::Cardinal::Genitive',
   on => 'Lingua::CS::Num2Words::Ordinal::Nominative',
   og => 'Lingua::CS::Num2Words::Ordinal::Genitive',
+  cd => 'Lingua::CS::Num2Words::Decimal',
 );
 
 sub num2cs_cardinal {
@@ -168,6 +170,11 @@ sub num2cs_cardinal {
   my %opts = @_;
   my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
   my $kind = 'c';
+
+  $num =~ s/\.//g;
+  if ($num =~ /,/) {
+    @cases = ('d'); # decimal
+  }
 
   my @unfolded;
   for my $case (@cases) {

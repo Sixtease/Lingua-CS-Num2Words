@@ -59,7 +59,7 @@ sub get_variants {
   return () if $number < 0;
 
   # false if called recursively as a part of greater number
-  if (delete $opts{final}) {
+  if (delete $opts{final} and not $opts{gender}) {
     if ($number == 1) {
       return (['|', 'jeden', 'jedna', 'jedno']);
     }
