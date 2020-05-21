@@ -5,7 +5,7 @@ use strict;
 use 5.010;
 use Lingua::CS::Num2Words::Cardinal::Nominative;
 
-my %token1 = qw(
+our %token1 = qw(
    0 nuly         1 jedné         2 dvou
    3 tří          4 čtyř          5 pěti
    6 šesti        7 sedmi         8 osmi
@@ -18,23 +18,23 @@ my %token1 = qw(
 $token1{1}  = [qw(| jedné jednoho)];
 $token1{10} = [qw(| deseti desíti)];
 
-my %token1_f = (%token1, 1 => 'jedné');
-my %token1_m = (%token1, 1 => 'jedoho');
-my %token1_n = %token1_m;
-my %token1_gender = (
+our %token1_f = (%token1, 1 => 'jedné');
+our %token1_m = (%token1, 1 => 'jedoho');
+our %token1_n = %token1_m;
+our %token1_gender = (
   g => \%token1,  # general
   f => \%token1_f,
   m => \%token1_m,
   n => \%token1_n,
 );
 
-my %token2 = qw(
+our %token2 = qw(
   20 dvaceti      30 třiceti       40 čtyřiceti
   50 padesáti     60 šedesáti      70 sedmdesáti
   80 osmdesáti    90 devadesáti
 );
 
-my %token3 = (
+our %token3 = (
   100, 'sta',       200, 'dvou set', 300, 'tří set',
   400, 'čtyř set',  500, 'pěti set', 600, 'šesti set',
   700, 'sedmi set', 800, 'osmi set', 900, 'devíti set'

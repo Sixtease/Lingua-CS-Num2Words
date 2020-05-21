@@ -51,6 +51,7 @@ use Lingua::CS::Num2Words::Ordinal::Nominative;
 use Lingua::CS::Num2Words::Ordinal::Genitive;
 use Lingua::CS::Num2Words::Decimal;
 use Lingua::CS::Num2Words::Date;
+use Lingua::CS::Num2Words::Time;
 
 BEGIN {
   use Exporter ();
@@ -58,7 +59,7 @@ BEGIN {
   $VERSION    = 2.01;
   ($REVISION) = '$Revision: 0.01 $' =~ /([\d.]+)/;
   @ISA        = qw(Exporter);
-  @EXPORT_OK  = qw(num2cs_cardinal num2cs_ordinal num2cs_date);
+  @EXPORT_OK  = qw(num2cs_cardinal num2cs_ordinal num2cs_date num2cs_time);
 }
 sub proc {
   my $acc = shift;
@@ -168,7 +169,7 @@ my %kind_case_to_package = (
 sub num2cs_cardinal {
   my $num = pop;
   my %opts = @_;
-  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
+  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{case} || 'nominativ,genitiv');
   my $kind = 'c';
 
   $num =~ s/\.//g;
@@ -183,9 +184,8 @@ sub num2cs_cardinal {
       warn "unsupported case for cardinals: $case";
       next;
     }
-    say $package;
     no strict 'refs';
-    my @variants = "${package}::get_variants"->($num, final => 1);
+    my @variants = "${package}::get_variants"->($num, final => 1, %opts);
 
     #use Data::Dumper; print(Dumper(@variants));
     push @unfolded, unfold @variants;
@@ -199,7 +199,7 @@ sub num2cs_cardinal {
 sub num2cs_ordinal {
   my $num = pop;
   my %opts = @_;
-  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{'--case'} || 'nominativ,genitiv');
+  my @cases = map {substr($_, 0, 1)} split /,/, ($opts{case} || 'nominativ,genitiv');
   my $kind = 'o';
 
   my @unfolded;
@@ -209,9 +209,8 @@ sub num2cs_ordinal {
       warn "unsupported case for ordinals: $case";
       next;
     }
-    say $package;
     no strict 'refs';
-    my @variants = "${package}::get_variants"->($num, final => 1);
+    my @variants = "${package}::get_variants"->($num, final => 1, %opts);
 
     #use Data::Dumper; print(Dumper(@variants));
     push @unfolded, unfold @variants;
@@ -226,6 +225,19 @@ sub num2cs_date {
   my $date_str = pop;
 
   my @variants = Lingua::CS::Num2Words::Date::get_variants($date_str, final => 1);
+  #use Data::Dumper; print(Dumper(@variants));
+
+  my @unfolded = unfold @variants;
+  my @flattened = flatten(@unfolded);
+  my %flattened_dedup = map {; $_ => 1 } @flattened;
+  return sort keys %flattened_dedup;
+}
+
+sub num2cs_time {
+  my $time_str = pop;
+  my %opts = @_;
+
+  my @variants = Lingua::CS::Num2Words::Time::get_variants($time_str, final => 1, %opts);
   #use Data::Dumper; print(Dumper(@variants));
 
   my @unfolded = unfold @variants;

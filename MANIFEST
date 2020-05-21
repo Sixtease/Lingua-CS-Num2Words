@@ -4,8 +4,10 @@ Makefile.PL
 lib/Lingua/CS/Num2Words.pm
 lib/Lingua/CS/Num2Words/Ordinal/Genitive.pm
 lib/Lingua/CS/Num2Words/Ordinal/Nominative.pm
+lib/Lingua/CS/Num2Words/Cardinal/Accusative.pm
 lib/Lingua/CS/Num2Words/Cardinal/Genitive.pm
 lib/Lingua/CS/Num2Words/Cardinal/Nominative.pm
 lib/Lingua/CS/Num2Words/Date.pm
+lib/Lingua/CS/Num2Words/Time.pm
 README
 t/use.t

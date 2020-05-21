@@ -24,7 +24,7 @@ sub get_variants {
 
   $date_str =~ s/^\W+//;
   $date_str =~ s/\W+$//;
-  my ($inday, $inmonth, $inyear) = split /\W+/, $date_str;
+  my ($inday, $inmonth, $inyear) = split /\W+/, lc $date_str;
 
   if (not $inday or not $inmonth) {
     warn "Unexpected date format: '$date_str'";
@@ -38,6 +38,8 @@ sub get_variants {
   }
 
   my $month;
+  my $explicit_case = '';
+  my $explicit_month = '';
   if ($inmonth >= 1 and $inmonth <= 12) {
     $month = int $inmonth;
   }
@@ -55,6 +57,19 @@ sub get_variants {
       }
     }
   }
+  if ($inmonth eq $word_months_genitive[$month]) {
+    $explicit_month = $inmonth;
+    $explicit_case = 'g';
+  }
+  if ($inmonth eq $word_months_nominative[$month]) {
+    $explicit_month = $inmonth;
+    if ($explicit_case) {
+      $explicit_case = '';
+    }
+    else {
+      $explicit_case = 'n';
+    }
+  }
   if (not $month) {
     warn "Unexpected month: '$inmonth'"
   }
@@ -68,22 +83,37 @@ sub get_variants {
     return ();
   }
 
-  my @result = ['|',
-    [
-      [Lingua::CS::Num2Words::Ordinal::Genitive::get_variants($day, final => 1)],
-      ['|',
-        [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants($month, gender => 'm', canonical => 1, final => 1)],
-        [$word_months_genitive[$month]],
-      ],
-    ],
-    [
-      [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants($day, gender => 'm', canonical => 1, final => 1)],
-      [$word_months_nominative[$month]],
-    ],
-  ];
+  my $nom_day = [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants(
+      $day, gender => 'm', canonical => 1, final => 1,
+  )];
+  my $nom_mon = $word_months_nominative[$month];
+  my $gen_day = [Lingua::CS::Num2Words::Ordinal::Genitive::get_variants($day, final => 1)];
+  my $gen_mon_num = [Lingua::CS::Num2Words::Ordinal::Nominative::get_variants(
+      $month, gender => 'm', canonical => 1, final => 1,
+  )],
+  my $gen_mon_word = $word_months_genitive[$month];
+
+  my @result;
+  if ($explicit_case eq 'n') {
+    @result = ($nom_day, $explicit_month);
+  }
+  elsif ($explicit_month) { # explicit genitive or XX. září => implicit genitive
+    @result = ($gen_day, $explicit_month);
+  }
+  elsif ($month == 9) {
+    @result = ($gen_day, ['|', $gen_mon_num, $gen_mon_word])
+  }
+  else {
+    @result = ['|',
+      [$gen_day, ['|', $gen_mon_num, $gen_mon_word]],
+      [$nom_day, $nom_mon],
+    ];
+  }
 
   if ($year) {
-    push @result, [Lingua::CS::Num2Words::Cardinal::Nominative::get_variants($year, final => 1, skip_leading_one => 1)];
+    push @result, Lingua::CS::Num2Words::Cardinal::Nominative::get_variants(
+      $year, final => 1, skip_leading_one => 1,
+    );
   }
 
   return @result;

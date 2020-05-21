@@ -15,6 +15,16 @@ our %token1_m = qw(
   18 osmnáctého  19 devatenáctého
 );
 
+our %token1_f = qw(
+   0 nulté        1 první         2 druhé
+   3 třetí        4 čtvrté        5 páté
+   6 šesté        7 sedmé         8 osmé
+   9 deváté      10 desáté       11 jedenácté
+  12 dvanácté    13 třinácté     14 čtrnácté
+  15 patnácté    16 šestnácté    17 sedmnácté
+  18 osmnácté    19 devatenácté
+);
+
 our %token2_m = qw(
   20 dvacátého   30 třicátého    40 čtyřicátého
   50 padesátého  60 šedesátého   70 sedmdesátého
