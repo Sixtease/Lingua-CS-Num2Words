@@ -37,14 +37,14 @@ sub get_variants {
 
   # nula celá jedna dva tři
   if (length $frac > 1) {
-    my $numeral_frac = \@fracw;
-    my $digital_frac = [map
+    my @numeral_frac = @fracw;
+    my @digital_frac = (map
       $Lingua::CS::Num2Words::Cardinal::Nominative::token1{$_},
       split //, $frac,
-    ];
+    );
     @fracw = ['|',
-      $numeral_frac,
-      $digital_frac,
+      [@numeral_frac],
+      [@digital_frac],
     ];
   }
 
